@@ -1,0 +1,35 @@
+  <ion-content id="login-content" padding="true" class="manual-ios-statusbar-padding" sytle="position: fixed;">
+    <!--
+	<div>
+      <img src="assets/imgs/loginNewLogo_border.png" style="display: block; width: 100%; height: auto; margin-left: auto; margin-right: auto;">
+    </div>
+	<div class="spacer" style="height: 15%;"></div>
+	
+	<div style="height:42%;">
+		<img src="assets/imgs/loginPageBackground_top.png" style="display: block; width: 100%; height: 100%; margin-left: auto; margin-right: auto;">
+    </div>-->
+	<form id="login-form1" class="list" (ngSubmit)="login()" #registerForm="ngForm">
+		<ion-list id="login-list1" >
+		<div class="spacer" style="height: 320px;"></div>
+	
+			<ion-label fixed center style="margin: auto; font-size:40px; color: white; width: 100%; height: 65px; ">WELCOME</ion-label>
+			
+			<ion-item id="login-input1" name="UserID" class="login-input">
+			  <ion-icon name="person" item-start ></ion-icon>
+			  <ion-label>|</ion-label>
+			  <ion-input type="text" [(ngModel)]="registerCredentials.username" name="registerCredentials.username" required></ion-input>
+			</ion-item>
+			<ion-item id="login-input2" name="password" class="login-input">
+				<ion-icon name="lock" item-start ></ion-icon>
+				<ion-label>|</ion-label>
+			  <ion-input type="password" [(ngModel)]="registerCredentials.password" name="registerCredentials.password" required></ion-input>
+			</ion-item>
+			<button ion-button full round color="danger" id="login-input3" type="submit" class="login-input">Login</button>
+		  <div class="spacer" style="height: 100px;"></div>
+      
+		</ion-list>
+      
+	  <!--
+	  <button ion-button full outline id="login-button2" ng-click="adminLogin()">관리자 로그인</button>-->
+    </form>
+  </ion-content>

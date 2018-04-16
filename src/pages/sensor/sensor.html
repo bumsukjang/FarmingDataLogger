@@ -1,0 +1,60 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Farming Data Logger</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+	<ion-card>
+		<ion-card-content>
+			<canvas #lineCanvas></canvas>
+		</ion-card-content>
+    </ion-card>
+	<ion-list>
+		<ion-item>
+			<ion-icon name="time" item-start ></ion-icon>
+			<ion-label>
+			  측정시간
+			</ion-label>
+			<div item-content>
+				{{this.date | date: 'yyyy/MM/dd H:mm:ss'}}
+			</div>
+		</ion-item>
+		<ion-item>
+			<ion-icon name="thermometer" item-start ></ion-icon>
+			<ion-label>온도</ion-label>
+			<div item-content>
+				{{this.temp}} ℃
+			</div>
+		</ion-item>
+		<ion-item>
+			<ion-icon name="ios-pulse" item-start ></ion-icon>
+			<ion-label>습도</ion-label>
+			<div item-content>
+				{{this.humi}} RH
+			</div>
+		</ion-item>
+		<ion-item>
+			<ion-icon name="locate" item-start ></ion-icon>
+			<ion-label>
+				사이트 번호
+			</ion-label>
+			<div item-content>
+				{{this.siteID}}
+			</div>
+		</ion-item>
+		<ion-item>
+			<ion-icon name="power" item-start ></ion-icon>
+			<ion-label>
+				상태
+			</ion-label>
+			<div item-content>
+				{{this.alive}}
+			</div>
+		</ion-item>
+	</ion-list>
+	<button ion-button full (click)="logout()">로그아웃</button>
+	<script>
+		setInterval(updateData(), 3000);
+	</script>
+</ion-content>

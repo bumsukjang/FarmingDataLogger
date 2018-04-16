@@ -1,0 +1,281 @@
+
+<!DOCTYPE html>
+
+<link rel="stylesheet" type="text/css" href="/static/css/index.css"> 
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+	<title>Farming[1,1]</title>
+</head>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+<script type="text/javascript" src="https://code.highcharts.com/modules/exporting.js"></script>
+<script type="text/javascript" src="https://code.highcharts.com/modules/data.js"></script>
+
+<style>
+body { 
+	width: 100%;
+	height: 100%;
+	background: url("/static/css/images/bg.jpg") no-repeat top center; 
+}
+
+#round_btn {
+    width: 89px;
+    height: 25px;
+	font-size:13px;
+	font-weight:bold;
+    font-family: 'Nanum Gothic';
+    color: black;
+    line-height: 2px;
+    text-align: center;
+    background:lightgray;
+    border: solid 1px grey;
+		border-radius: 12px;
+		margin: auto;
+  }
+</style>
+
+<body>
+  <!-- User Java Script Code  -->
+    <script type="text/javascript">
+
+      function getDateTime() {
+        var clock = document.getElementById("clock"); // 출력할 장소 선택
+        var now = new Date();                                                  // 현재시간
+        var nowTime = now.getFullYear() + "년" + (now.getMonth()+1) + "월" + now.getDate() + "일" + now.getHours() + "시" + now.getMinutes() + "분" + now.getSeconds() + "초";
+        clock.innerHTML = nowTime; // 현재시간을 출력
+      }
+
+
+      //60초 마다 화면 Refresh: 60*1000=60000
+  //    setTimeout("location.reload()", 1000);         // setTimeout(“실행할함수”,시간) 시간은1초의 경우 1000
+
+      // 매분 화면 업데이트
+
+      setInterval(function() {
+        updateJavaTrend();
+      }, 60000); // 60000
+
+      setInterval(function() {
+        //updateJavaData();
+      }, 5000); // 60000
+
+      // 매초 시계 업데이트
+      setInterval(function() {
+        updateJavaData();
+        getDateTime();
+      }, 1000);
+
+      window.onload = function() {                         // 페이지가 로딩되면 실행
+        updateJavaData();
+        updateJavaTrend();
+        getDateTime();
+      }
+
+  </script>
+
+	<!-- 제목 영역 
+			<div style="text-align:center; top:500px; width: 1100px; height: 330px;">
+	-->
+	<div style="width: 1000px; height: 250px"></div>
+
+	<!-- 장비 정보 및 설치 위치 처리 -->
+	<!--
+	<div style="text-align:center; border:1px solid lightgray; left:10px; width:1000px; height: 180px;">
+			<div id="deviceStatus"> </div>
+			<h3 style="color:black">DEVICE ID : fca076 / DEVICE LOCATION : TEST ADDRESS #1</h3>
+			<div> <h3 style="color:black">현재 시각 : <span id="clock"></h3></span> </div>
+			<div id="deviceMsg"> </div>
+		</div>
+	-->
+
+
+	<div style="text-align:center; width: 470px; height: 20px; margin:auto;"> 
+		<h4>현재 시각 : <span id="clock"></span></h4> 
+	</div>
+	
+	<!-- Table   -->
+	<!-- <div id = "data-container" style="border:1px solid lightgray;"> -->
+	<div style="width: 470px; height: 130px; margin:auto;">
+		<br>
+		<div id="deviceTable"> </div>
+		<br>
+	</div>
+	<br>
+
+	<div style="text-align:center; width: 470px; height: 40px; margin:auto;">
+		<form method="get">
+		<input id="round_btn" type="submit" value="Humidity" name="btn_humi" style="background-color:lightgray"/>
+		
+		<input id="round_btn" type="submit" value="Day" name="btn_day" style="background-color:yellow"/>
+		
+		
+		<input id="round_btn" type="submit" value="Week" name="btn_week" style="background-color:lightgray"/>
+		
+		
+		<input id="round_btn" type="submit" value="Month" name="btn_month" style="background-color:lightgray"/>
+				
+		<input id="round_btn" type="submit" value="Logout" name="btn_logout" style="background-color:white"/>
+	</form>
+	</div>
+
+	<!-- Trend 표시 -->
+	<div id="temp_container" style="width:470px; height: 250px; margin:auto;">
+	<script type="text/javascript">
+		var str_num = 1;
+		var str_req = 1;
+		function updateJavaTrend() {
+
+		$.get('temp_trend_json', {site_id:str_num, req_type:str_req}, function(jsondata) {
+
+        Highcharts.setOptions({
+                lang: {
+                        loading: '로드중...',
+                        shortMonths: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+                        weekdays: ['일', '월', '화', '수', '목', '금', '토'],
+                }
+        });      
+    
+      Highcharts.chart('temp_container', {
+        title: {
+          text: null,
+          x: 0
+        },
+        xAxis: {
+          type: 'datetime',
+          dateTimeLabelFormats: {
+            day: '%b%e일',
+          }
+        },
+        yAxis: {
+          title: {
+            text: 'Temperature (°C)'
+          },
+            min: -50,
+            max: 100
+        },
+        global: {
+          useUTC: false
+        },
+        plotOptions: {
+          series: { color: '#9F0F00' }
+        },
+        credits: {
+          enabled: false
+            },
+        chart: {
+          type: 'spline'
+        },
+        data: jsondata,
+          });				
+        });
+	}
+	</script>
+	</div>
+
+	<script type="text/javascript">
+		var str_num = 1;
+		var str_req = 1;
+		function updateJavaData() {
+        $.get('data_json', {site_id:str_num, req_type:str_req}, function(jsondata) {
+
+					/*
+					var strData = "";
+					var deviceMsg = document.getElementById("deviceMsg"); // 출력할 장소 선택
+					var strDevice = "<h3>";
+					strData = jsondata["msg_device"];
+					strDevice += strData + "</h3>";
+
+					deviceMsg.innerHTML = strDevice;
+
+
+					var live_sts = ""; //imsi
+					var strSts = "";
+					var deviceInfo = document.getElementById("deviceStatus"); // 출력할 장소 선택
+					live_sts = jsondata["site_live"];
+
+					if(live_sts=="True") {
+						strInfo = "<h3 style=color:blue>DEVICE STATUS: 데이터 저장 진행중</h3>";
+					} else {
+						strInfo = "<h3 style=color:red>DEVICE STATUS: 데이터 저장 중지</h3>";
+					}
+
+					deviceInfo.innerHTML = strInfo;
+					*/
+
+					var deviceSheet = document.getElementById("deviceTable"); // 출력할 장소 선택
+					var strTable = "";
+
+					strTable += "<table style='text-align:center;' border='2'>";
+					strTable += "<thead>";
+					strTable += "<tr>";
+					strTable += "<th scope='cols' bgcolor=yellow>SENSOR TYPE</th>";
+					strTable += "<th scope='cols' bgcolor=yellow>SENSOR VALUE</th>";
+					strTable += "<th scope='cols' bgcolor=yellow>UNIT</th>";
+					strTable += "<th scope='cols' bgcolor=yellow>HIGH ALARM</th>";
+					strTable += "<th scope='cols' bgcolor=yellow>LOW ALARM</th>";
+					strTable += "</tr>";
+					strTable += "</thead>";
+
+					var strCh = ["ch1", "ch2", "ch3", "ch4", "ch5", "ch6", "ch7", "ch8"];
+
+					for(i=0; i<2; i++) {
+
+						strTable += "<tr>";
+						strTable += "<td width='80'>";
+						strTable +=  jsondata[strCh[i]][1]; // Name
+						strTable += "</td>";
+						strTable += "<td width='80'>";
+						strTable +=  jsondata[strCh[i]][2]; // Value
+						strTable += "</td>";
+						strTable += "<td width='60'>";
+						strTable +=  jsondata[strCh[i]][3]; // Unit
+						strTable += "</td>";
+
+						var high_alarm = jsondata[strCh[i]][6];
+						var low_alarm = jsondata[strCh[i]][7];
+
+						if(high_alarm==true) {
+							strTable += "<td width='60' bgcolor=red>";
+							strTable +=  jsondata[strCh[i]][4];
+							strTable += "</td>";
+						} else {
+							strTable += "<td width='60' bgcolor=green>";
+							strTable +=  jsondata[strCh[i]][4];
+							strTable += "</td>";
+						}
+
+						if(low_alarm==true) {
+							strTable += "<td width='60' bgcolor=red>";
+							strTable +=  jsondata[strCh[i]][5];
+							strTable += "</td>";
+						} else {
+							strTable += "<td width='60' bgcolor=green>";
+							strTable +=  jsondata[strCh[i]][5];
+							strTable += "</td>";
+						}
+
+
+						strTable += "</tr>";
+					}
+
+					strTable += "</table>"
+          deviceSheet.innerHTML = strTable;
+        });
+      }
+  </script>
+	
+
+	<!-- License 표시 
+	<div id="title-image" style="text-align:center; width: 950px; height: 100px; margin:auto;">
+    <hr color='gray' size=2>
+    <h2 style="color:black; font-weight:bold">Cpyright(C) 2018 by DAONRS Co., Ltd.</h2>
+    <hr color='gray' size=3>
+  </div>
+	-->
+	<div style="width: 1000px; height: 200px"></div>
+  
+</body>
+</html>

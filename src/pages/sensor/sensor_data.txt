@@ -1,0 +1,86 @@
+{
+  "ch1": [
+    true, 
+    "\uc628\ub3c4", 
+    21.45, 
+    "\u2103", 
+    32.0, 
+    -3.0, 
+    false, 
+    false
+  ], 
+  "ch2": [
+    true, 
+    "\uc2b5\ub3c4", 
+    41.89, 
+    "RH", 
+    80.0, 
+    20.0, 
+    false, 
+    false
+  ], 
+  "ch3": [
+    false, 
+    "\uc628\ub3c4", 
+    3.0, 
+    "\u2103", 
+    32.0, 
+    -3.0, 
+    false, 
+    false
+  ], 
+  "ch4": [
+    false, 
+    "\uc2b5\ub3c4", 
+    4.0, 
+    "RH", 
+    80.0, 
+    20.0, 
+    false, 
+    true
+  ], 
+  "ch5": [
+    false, 
+    "\uc628\ub3c4", 
+    5.0, 
+    "\u2103", 
+    32.0, 
+    -3.0, 
+    false, 
+    false
+  ], 
+  "ch6": [
+    false, 
+    "\uc2b5\ub3c4", 
+    6.0, 
+    "RH", 
+    80.0, 
+    20.0, 
+    false, 
+    true
+  ], 
+  "ch7": [
+    false, 
+    "\uc628\ub3c4", 
+    7.0, 
+    "\u2103", 
+    32.0, 
+    -3.0, 
+    false, 
+    false
+  ], 
+  "ch8": [
+    false, 
+    "\uc2b5\ub3c4", 
+    8.0, 
+    "RH", 
+    80.0, 
+    20.0, 
+    false, 
+    true
+  ], 
+  "msg_device": "\ub370\uc774\ud130 \uc800\uc7a5 \uc2dc\uac04 : 2018-03-31 22:00:08", 
+  "num_site": 1, 
+  "req_type": 1, 
+  "site_live": "False"
+}

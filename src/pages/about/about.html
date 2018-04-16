@@ -1,0 +1,93 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>계정정보</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+	<ion-list>
+		<ion-item>
+			<ion-icon name="person" item-start ></ion-icon>
+			<ion-label>
+				사용자ID
+			</ion-label>
+			<div item-content>
+				{{this.username}}
+			</div>
+		</ion-item>
+		<ion-item>
+			<ion-icon name="locate" item-start ></ion-icon>
+			<ion-label>
+				사이트 번호
+			</ion-label>
+			<div item-content>
+				{{this.siteId}}
+			</div>
+		</ion-item>
+		<ion-item>
+			<ion-icon name="speedometer" item-start ></ion-icon>
+			<ion-label>
+				디바이스
+			</ion-label>
+			<div item-content>
+				{{this.device}}
+			</div>
+		</ion-item>
+		<ion-item>
+			<ion-icon name="pin" item-start ></ion-icon>
+			<ion-label>
+				위치
+			</ion-label>
+			<div item-content>
+				{{this.location}}
+			</div>
+		</ion-item>
+		<ion-item>
+			<ion-icon name="call" item-start ></ion-icon>
+			<ion-label>
+				핸드폰
+			</ion-label>
+			<div item-content>
+				{{this.phone}}
+			</div>
+		</ion-item>
+		<ion-item-divider>
+			알람기준
+		</ion-item-divider>
+		<ion-item>
+			<ion-icon name="thermometer" item-start ></ion-icon>
+			<ion-label>최고온도(℃)</ion-label>
+			<ion-input item-content [(ngModel)]="ch1High" name="ch1High"></ion-input>
+		</ion-item>
+		<ion-item>
+			<ion-icon name="thermometer" item-start ></ion-icon>
+			<ion-label>최저온도(℃)</ion-label>
+			<ion-input item-content [(ngModel)]="ch1Low" name="ch1Low"></ion-input>
+		</ion-item>
+		<!--
+		<ion-item>
+			<ion-icon name="ios-pulse" item-start ></ion-icon>
+			<ion-label>최고습도(RH)</ion-label>
+			<ion-range item-content dualKnobs="true" pin="true" [(ngModel)]="tempHighLow" min="-50" max="100" step="0.1" snaps="true"></ion-range>
+		</ion-item>
+		-->
+		<ion-item>
+			<ion-icon name="ios-pulse" item-start ></ion-icon>
+			<ion-label>최고습도(RH)</ion-label>
+			<ion-input item-content [(ngModel)]="ch2High" name="ch2High"></ion-input>
+		</ion-item>
+		<ion-item>
+			<ion-icon name="ios-pulse" item-start ></ion-icon>
+			<ion-label>최저습도(RH)</ion-label>
+			<ion-input item-content [(ngModel)]="ch2Low" name="ch2Low"></ion-input>
+		</ion-item>
+		<!--
+		<ion-item>
+			<ion-icon name="ios-pulse" item-start ></ion-icon>
+			<ion-label>최고습도(RH)</ion-label>
+			<ion-range item-content dualKnobs="true" pin="true" [(ngModel)]="hHighLow" min="-50" max="100" step="0.1" snaps="true"></ion-range>
+		</ion-item>
+		-->
+	</ion-list>
+	<button ion-button full (click)="saveSetting()">저장</button>
+</ion-content>
