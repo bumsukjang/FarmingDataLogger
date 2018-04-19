@@ -9,7 +9,7 @@ import { AuthServiceProvider } from '../../providers/auth-service/auth-service';
 import { HTTP } from '@ionic-native/http';
 import { BackgroundMode } from '@ionic-native/background-mode';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs/Rx';
 
 import { LoginPage } from '../login/login';
 
