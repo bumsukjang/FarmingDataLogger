@@ -1,6 +1,6 @@
 {
   "name": "testNotification",
-  "app_id": "",
+  "app_id": "b52cb124",
   "type": "ionic-angular",
   "integrations": {
     "cordova": {}
