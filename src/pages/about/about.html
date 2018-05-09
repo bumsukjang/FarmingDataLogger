@@ -52,6 +52,27 @@
 			</div>
 		</ion-item>
 		<ion-item-divider>
+			채널설정
+		</ion-item-divider>
+		<ion-row *ngFor="let i of [0,1,2,3,4,5,6,7]">
+			<ion-col width-20>
+				<ion-item>
+					<ion-label>ch{{i+1}}</ion-label>
+					<ion-checkbox [(ngModel)]="chDisplay[i]"></ion-checkbox>
+				</ion-item>
+			</ion-col>
+			<ion-col width-40>
+				<ion-item>
+					<ion-input item-content [(ngModel)]="chNames[i]" placeholder="이름"></ion-input>
+				</ion-item>
+			</ion-col>
+			<ion-col width-40>
+				<ion-item>
+					<ion-input item-content [(ngModel)]="chUnits[i]" placeholder="단위"></ion-input>
+				</ion-item>
+			</ion-col>
+		</ion-row>
+		<ion-item-divider>
 			알람기준
 		</ion-item-divider>
 		<ion-item>

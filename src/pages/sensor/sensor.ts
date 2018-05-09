@@ -2,17 +2,23 @@ import { Component, ViewChild  } from '@angular/core';
 import { NavController, AlertController, Platform } from 'ionic-angular';
 
 import { Chart } from 'chart.js';
+//import 'hammerjs';
+//import 'chartjs-plugin-zoom';
+//import * as zoom from 'chartjs-plugin-zoom'
 
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { AuthServiceProvider } from '../../providers/auth-service/auth-service';
 
+import { SettingServiceProvider } from '../../providers/setting-service/setting-service';
+
+
 import { HTTP } from '@ionic-native/http';
 import { BackgroundMode } from '@ionic-native/background-mode';
 
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/interval';
+import { Observable } from 'rxjs/Rx';
 
 import { LoginPage } from '../login/login';
+import { DomElementSchemaRegistry } from '@angular/compiler';
 
 @Component({
   selector: 'page-sensor',
@@ -28,43 +34,31 @@ export class SensorPage {
 	data: String;
 	siteID: String;
 	json_data: JSON;
-	temp: Number;
-	humi: Number;
+	ch: number[] = [1,2,3,4,5,6,7];
 	msg_device: String;
 	alive: String = "연결안됨";
 	http: HTTP;
-	
-	constructor(public backgroundMode : BackgroundMode, public navCtrl: NavController, public alertCtrl: AlertController, public plt: Platform, public localNotifications: LocalNotifications, public auth: AuthServiceProvider, public httpd: HTTP ) {
+	setting;
+	graphMinTime;
+	graphMaxTime;
+	constructor(public backgroundMode : BackgroundMode, 
+	public navCtrl: NavController, 
+	public alertCtrl: AlertController, 
+	public plt: Platform, 
+	public localNotifications: LocalNotifications, 
+	public auth: AuthServiceProvider, 
+	public httpd: HTTP, 
+	private settingService: SettingServiceProvider	) {
 		this.http = httpd;
-		/*
-		this.plt.ready().then((rdy)=>{
-			this.localNotifications.on('click', (notification, state) => {
-				let json = JSON.parse(notification.data);
-			
-				let alert = this.alertCtrl.create({
-					title: notification.title,
-					subTitle: json.mydata,
-					buttons: ['OK']
-				});
-				alert.present();
-			});
-		});
-		*/
+		settingService.init(auth.getUserInfo().getUsername());
+
 		plt.registerBackButtonAction(() => {
 			backgroundMode.moveToBackground();
 		});
-		
-		//this.updateData(http);
-		
-		//console.log('interval test');
-		//Observable.interval(10 * 1000).subscribe(()=>{
-		//	this.updateData();
-		//});
-		//setInterval(()=>{
-		//this.updateData();}, 3000);
+
 		backgroundMode.setDefaults({
 			title: "DAONRS",
-			text: "Farming Data Logger 데이터 모니터링",
+			text: "Farming Data Logger",
 			icon: 'icon', // this will look for icon.png in platforms/android/res/drawable|mipmap
 			color: "F14F4D", // hex format like 'F14F4D'
 			resume: true,
@@ -73,177 +67,168 @@ export class SensorPage {
 		});
 		
 		this.updateData();
-		//let intervalTime = 15 * 1000;
 		Observable.interval(5 * 60 * 1000).subscribe(()=>{
 			this.updateData();
 		});
-		/*
-		backgroundMode.on("activate").subscribe(()=>function(){
-			Observable.interval(5 * 1000).subscribe(()=>{
-				this.updateData();
-			});
-		});
-		backgroundMode.on('deactivate').subscribe(()=>function(){
-			Observable.interval(5 * 1000).subscribe(()=>{
-				this.updateData();
-			});
-		});
-		*/
-		//backgroundMode.overrideBackButton();
-		backgroundMode.enable();
-		/*
-		this.data = "tejksaldjg Farming data logger asdafds";
-	  
-		console.log(this.data);
-		this.siteID = this.data.substr(this.data.indexOf("Farming[")+8,3).split(",")[0];
-		console.log("siteID : " + this.siteID);
-		console.log(this.data.substr(this.data.indexOf("Farming[")+8,3).split(",")[1]);
-	
-		console.log('JSON test');
-		this.json_data = JSON.parse('{"ch1": [	true, "\uc628\ub3c4",21.45,"\u2103",32.0,-3.0,false,false],"ch2": [true,"\uc2b5\ub3c4",41.89,"RH",80.0,20.0,false,false]}');
-		console.log(this.json_data['ch1'][1]);
-		console.log(this.json_data['ch1'][2]);
-		console.log(this.json_data['ch1'][3]);
-	  
-		console.log(this.json_data['ch1'][6]);
-		console.log(this.json_data['ch1'][7]);
-		this.date = new Date(new Date().getTime());
-		console.log('JSON test');
-	    this.json_data = JSON.parse('{"ch1": [	true, "\uc628\ub3c4",21.45,"\u2103",32.0,-3.0,false,false],"ch2": [true,"\uc2b5\ub3c4",41.89,"RH",80.0,20.0,false,false]}');
-	    console.log(this.json_data);
-		this.temp = this.json_data['ch1'][2];
-		this.humi = this.json_data['ch2'][2];
-		
-		
-		*/
-		
-		
-		
-		//this.scheduleNotification(() => console.log('notification done'));
+		backgroundMode.enable();	
 	}
+
+	ionViewWillEnter(){
+		console.log('[sensor.ts] - ionViewWillEnter()');
+		this.setting = this.settingService.get();
+		console.log('[sensor.ts] - ionViewWillEnter() this.setting : ' + this.setting);
+		console.log(this.setting);
+	}
+
 	updateData(){
+		let currentTime = new Date()
+		let month = currentTime.getMonth() + 1
+		let day = currentTime.getDate()
+		let year = currentTime.getFullYear()
+		this.graphMinTime = new Date(day + "/" + month  + "/" + year + "00:00:00");
+		this.graphMaxTime = new Date(day + "/" + month  + "/" + year + "23:59:59");
 		console.log("updateData");
-		//let interval = true;
-		//while(interval){
-			this.http.get('http://59.0.228.137:8081/index_temp/temp_trend_json/?site_id='+this.auth.getUserInfo().getSiteId()+'&req_type=1', {}, {})
+		let urls = ["temp_trend_json","humi_trend_json"];
+		for(var urlIndex = 0; urlIndex < urls.length; urlIndex++){
+			console.log("URL is");
+			console.log('http://59.0.228.137:8080/'+urls[urlIndex]+'?site_id='+this.auth.getUserInfo().getSiteId()+'&req_type=1');
+			this.http.get('http://59.0.228.137:8080/'+urls[urlIndex]+'?site_id='+this.auth.getUserInfo().getSiteId()+'&req_type=1', {}, {})
 			.then(data => {
-				//this.updateData();
-				//console.log(data);
-				//this.date = new Date(new Date().getTime());
-				console.log('JSON test');
+				let dataIndex = -1;		
+				console.log(data);		
 				this.json_data = JSON.parse(data.data);
-				//console.log(this.json_data);
-				//console.log(this.json_data['columns'][0].reverse());
+				console.log(this.json_data);				
+				if(this.json_data['columns'][1][0] == "Temperature"){
+					dataIndex = 0;
+				} else if(this.json_data['columns'][1][0] == "Humidity"){
+					dataIndex = 1;
+				}
+				console.log('[sensor data] : trendData ' + dataIndex);
+				
 				let chartConfig = this.chartConfig;
 				chartConfig.data.labels = [];
-				chartConfig.data.datasets[0].data = [];
-				console.log("date parsing test");
-				
-				//console.log(new Date(this.json_data['columns'][0][0]));
-				this.json_data['columns'][0].forEach(function(label){
-					console.log(label);
+				chartConfig.data.datasets[dataIndex].data = [];
+				/* let minTime;
+				let maxTime; */
+				for(var i = 0; i < this.json_data['columns'][0].length ; i++){
+					let label = this.json_data['columns'][0][i];
+					let dataset = this.json_data['columns'][1][i];
+					console.log("label : " + label);
+					console.log("dataset : " + dataset);
+					
 					if(label != null){
-						chartConfig.data.labels.push(new Date(label.toString().split("GMT")[0]));
+						let timeLabel = new Date(label.toString().split("GMT")[0]);
+						/* if(i == 0){	
+							maxTime = timeLabel;
+						} else if(i == this.json_data['columns'][0].length - 1){
+							minTime = timeLabel;
+						} */
+						chartConfig.data.labels.push(timeLabel);
+						chartConfig.data.datasets[dataIndex].data.push(dataset);
 					}
-				});
-				//this.chartConfig.data.labels.push(this.json_data['columns'][0].slice(1,10));
-				console.log(this.json_data['columns'][1].reverse());
-				//this.chartConfig.data.datasets[0].data.push(this.json_data['columns'][1].slice(1,10));
-				this.json_data['columns'][1].forEach(function(data){
-					console.log(data);
-					chartConfig.data.datasets[0].data.push(data);
-				});
+				}
+				/* chartConfig.options.scales.xAxes[0] = {
+					type: 'time',								
+					time: {
+						displayFormats: {
+							quarter: 'MMM YYYY'
+						},
+						minUnit: 'minute',
+						min: this.graphMinTime,
+						max: maxTime
+					},
+					distribution: 'series',
+					bounds: 'ticks',
+					ticks:{
+						source: 'auto'
+					}						
+				}; */
 				if(this.lineChart == null){
 					this.lineChart = new Chart(this.lineCanvas.nativeElement, chartConfig);
 				}
 				console.log(chartConfig);
-				this.lineChart.update();
-				//this.json_data['columns'][1];		
-						
+				this.lineChart.update();					
 			}).catch(error => {
 				console.log('error');
+				this.showAlert('접속 오류 : http://59.0.228.137:8080/'+urls[0]+'?site_id='+this.auth.getUserInfo().getSiteId()+'&req_type=1');
 				console.log(error);
 				console.log(error.status);			
 			});
+		}
+		/* 
+		
+		this.http.get('http://59.0.228.137:8080/humi_trend_json?site_id='+this.auth.getUserInfo().getSiteId()+'&req_type=1', {}, {})
+		.then(data => {
+			//this.updateData();
+			console.log(data);
+			this.date = new Date(new Date().getTime());
+			console.log('JSON test');
+			this.json_data = JSON.parse(data.data);
+			console.log(this.json_data);
+			console.log(this.json_data['columns'][0].slice(1,10));
+			let chartConfig = this.chartConfig;
 			
-			this.http.get('http://59.0.228.137:8081/index_humi/humi_trend_json/?site_id='+this.auth.getUserInfo().getSiteId()+'&req_type=1', {}, {})
-			.then(data => {
-				//this.updateData();
-				console.log(data);
-				this.date = new Date(new Date().getTime());
-				console.log('JSON test');
-				this.json_data = JSON.parse(data.data);
-				console.log(this.json_data);
-				console.log(this.json_data['columns'][0].slice(1,10));
-				let chartConfig = this.chartConfig;
-				
-				//this.json_data['columns'][0].reverse().forEach(function(label){
-					//chartConfig.data.labels.push(label);
-				//});
-				
-				//this.chartConfig.data.labels.push(this.json_data['columns'][0][0]);
-				console.log(this.json_data['columns'][1].slice(1,10));
-				chartConfig.data.datasets[1].data = [];
-				this.json_data['columns'][1].forEach(function(data){
-					chartConfig.data.datasets[1].data.push(data);
-				});
-				//this.chartConfig.data.datasets[1].data.push(this.json_data['columns'][1][0]);
-				if(this.lineChart == null){
-					this.lineChart = new Chart(this.lineCanvas.nativeElement, this.chartConfig);
-				}
-				this.lineChart.update();
-				//this.json_data['columns'][1];		
-						
-			}).catch(error => {
-				console.log('error');
-				console.log(error);
-				console.log(error.status);			
-			});		
+			//this.json_data['columns'][0].reverse().forEach(function(label){
+				//chartConfig.data.labels.push(label);
+			//});
 			
-			
-			this.http.get('http://59.0.228.137:8081/index_temp/data_json/?site_id='+this.auth.getUserInfo().getSiteId()+'&req_type=1', {}, {})
-			.then(data => {
-				console.log(data);
-				//this.date = new Date(new Date().getTime());
-				console.log('JSON test');
-				this.json_data = JSON.parse(data.data);
-				console.log(this.json_data);
-				this.date = this.json_data['msg_device'].split(' : ')[1];
-				this.temp = this.json_data['ch1'][2];
-				this.humi = this.json_data['ch2'][2];
-				if(this.temp > this.auth.getUserInfo().getCh1High() || this.temp < this.auth.getUserInfo().getCh1Low()){
-					this.showAlert("온도 이상");
-				}
-				if(this.humi > this.auth.getUserInfo().getCh2High() || this.humi < this.auth.getUserInfo().getCh2Low()){
-					this.showAlert("습도 이상");
-				}
-				//this.showAlert("알람 테스트");
-				this.siteID = this.json_data['num_site'];
-				if(this.json_data['site_live']){
-					this.alive = "정상작동";
-				} else {
-					this.alive = "연결안됨";
-				}
-				/*
-				if (this.chartConfig.data.datasets.length > 0) {
-					this.chartConfig.data.labels.push(new Date(new Date().getTime()).toString());
-
-					this.chartConfig.data.datasets[0].data.push(this.temp.valueOf());
-					this.chartConfig.data.datasets[1].data.push(this.humi.valueOf());
-					if(this.lineChart == null){
-						this.lineChart = new Chart(this.lineCanvas.nativeElement, this.chartConfig);
-					}
-					this.lineChart.update();
-				}
-				*/
-			}).catch(error => {
-				console.log('error');
-				console.log(error);
-				console.log(error.status);			
+			//this.chartConfig.data.labels.push(this.json_data['columns'][0][0]);
+			console.log(this.json_data['columns'][1].slice(1,10));
+			chartConfig.data.datasets[1].data = [];
+			this.json_data['columns'][1].forEach(function(data){
+				chartConfig.data.datasets[1].data.push(data);
 			});
-			
-			
-		//}
+			//this.chartConfig.data.datasets[1].data.push(this.json_data['columns'][1][0]);
+			if(this.lineChart == null){
+				this.lineChart = new Chart(this.lineCanvas.nativeElement, this.chartConfig);
+			}
+			this.lineChart.update();
+			//this.json_data['columns'][1];		
+					
+		}).catch(error => {
+			console.log('error');
+			console.log('[sensor.ts - updateData()] http://59.0.228.137:8080/humi_trend_json?site_id');
+			this.showAlert("http://59.0.228.137:8080/humi_trend_json 접속 오류");
+			console.log(error);
+			console.log(error.status);			
+		});		 */
+		
+		
+		this.http.get('http://59.0.228.137:8080/data_json?site_id='+this.auth.getUserInfo().getSiteId()+'&req_type=1', {}, {})
+		.then(data => {
+			this.json_data = JSON.parse(data.data);
+			this.date = this.json_data['msg_device'].split(' : ')[1];
+			for(var i = 0; i < 8; i++){
+				this.ch[i] = this.json_data['ch'+(i+1).toString()][2];	
+			}
+			if(this.setting != null){
+				if(this.ch[0] > this.setting.ch1High || this.ch[0] < this.setting.ch1Low){
+					this.showAlert("온도 이상(현재:"+this.ch[0]+")");
+					console.log('[sensor.ts] updateData() : ch1(' + this.ch[0] +'),ch1High(' +this.setting.ch1High+'),ch1Low('+this.setting.ch1Low+')');
+				}
+				if(this.ch[1] > this.setting.ch2High || this.ch[1] < this.setting.ch1Low){
+					this.showAlert("습도 이상(현재:"+this.ch[1]+")");
+					console.log('[sensor.ts] updateData() : ch2(' + this.ch[1] +'),ch1High(' +this.setting.ch2High+'),ch1Low('+this.setting.ch2Low+')');
+				}
+			}
+			this.siteID = this.json_data['num_site'];
+			if(this.json_data['site_live']){
+				this.alive = "정상작동";
+			} else {
+				this.alive = "연결안됨";
+			}
+			console.log('[sensor.ts] - updateData() http-get_data-then');
+			this.setting = this.settingService.get();
+			console.log('[sensor.ts] - updateData() http-get_data-then this.setting : ' + this.setting);
+			console.log(this.setting);
+		
+		}).catch(error => {
+			console.log('error');
+			console.log('[sensor.ts - updateData()] http://59.0.228.137:8080/data_json?site_id=');
+			this.showAlert("http://59.0.228.137:8080/data_json 접속 오류");
+			console.log(error);
+			console.log(error.status);			
+		});
 	}
 	
 	/*
@@ -279,10 +264,9 @@ export class SensorPage {
 			  buttons: ['OK']
 			});
 			alert.present();
-		}	
-		
-	  }
-	  
+		}		
+	  }	  
+	
 	chartConfig = { 
 		type: 'line',
 		/*
@@ -334,14 +318,16 @@ export class SensorPage {
 		options: {
 			scales: {
 				xAxes: [{
-					type: 'time',
-					
+					type: 'time',								
 					time: {
 						displayFormats: {
 							quarter: 'MMM YYYY'
-						}
+						},
+						minUnit: 'minute',
+						min: this.graphMinTime,
+						max: this.graphMaxTime
 					},
-					distribution: 'series'
+					distribution: 'linear',					
 				}],
 				yAxes: [{
 					type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
@@ -371,7 +357,11 @@ export class SensorPage {
 					max: 10,
 					min: 0.5
 				}
-			}			
+			},
+			pan: {
+				enabled: true,
+				mode: 'x'
+			}				
 		},
 		
 	};

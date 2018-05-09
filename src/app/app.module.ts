@@ -17,6 +17,10 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { AuthServiceProvider } from '../providers/auth-service/auth-service';
+import { SettingServiceProvider } from '../providers/setting-service/setting-service';
+
+import 'hammerjs';
+import 'chartjs-plugin-zoom';
 
 import { BackgroundMode } from '@ionic-native/background-mode';
 
@@ -55,7 +59,8 @@ import { IonicStorageModule } from '@ionic/storage';
 	HTTP,
 	BackgroundMode,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-    AuthServiceProvider
+    AuthServiceProvider,
+	SettingServiceProvider
   ]
 })
 export class AppModule {}

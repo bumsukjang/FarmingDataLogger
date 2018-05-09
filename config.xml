@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="daonrs.farmingDataLogger" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="daonrs.farmingDataLogger" version="0.0.5" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>DAONRS Farming Data Logger</name>
     <description>An awesome Ionic/Cordova app.</description>
-    <author email="hi@ionicframework" href="http://ionicframework.com/">Ionic Framework Team</author>
+    <author email="office@bs-soft.co.kr" href="http://ionicframework.com/">Ionic Framework Team</author>
     <content src="index.html" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
@@ -87,8 +87,6 @@
     <plugin name="cordova-plugin-background-mode" spec="^0.7.2" />
     <allow-navigation href="http://192.168.0.20:8100" />
     <plugin name="cordova-sqlite-storage" spec="^2.3.0" />
-    <engine name="android" spec="7.0.0" />
-    <engine name="ios" spec="4.5.4" />
     <plugin name="cordova-plugin-ionic" spec="^4.1.4">
         <variable name="APP_ID" value="62aaec98" />
         <variable name="CHANNEL_NAME" value="daonrs" />
@@ -97,4 +95,7 @@
         <variable name="UPDATE_API" value="https://api.ionicjs.com" />
         <variable name="MAX_STORE" value="2" />
     </plugin>
+    <allow-navigation href="http://192.168.43.54:8100" />
+    <engine name="android" spec="7.0.0" />
+    <engine name="ios" spec="4.5.4" />
 </widget>
