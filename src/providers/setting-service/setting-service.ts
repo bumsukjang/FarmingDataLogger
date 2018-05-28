@@ -15,22 +15,23 @@ import { Storage } from '@ionic/storage';
 class SettingInfo{
 	chNames: string[] = [];
 	chUnits: string[] = [];
+	chHighs: number[] = [];
+	chLows: number[] = [];
 	chDisplay: boolean[] = [];
-	
-	ch1High: number;
-	ch1Low: number;
-	
-	ch2High: number;
-	ch2Low: number;
-	
-	constructor(chNames, chUnits, chDisplay, ch1High, ch1Low, ch2High, ch2Low){
+	chRanges: any[] = [];
+	constructor(chNames, chUnits, chDisplay, chHighs, chLows){
 		this.chNames = chNames;
 		this.chUnits = chUnits;
 		this.chDisplay = chDisplay;
-		this.ch1High = ch1High;
-		this.ch1Low = ch1Low;
-		this.ch2High = ch2High;
-		this.ch2Low = ch2Low;
+		this.chHighs = chHighs;
+		this.chLows = chLows;
+		this.chRanges = new Array();
+		for(let i = 0 ; i < this.chHighs.length; i++){
+			this.chRanges.push({
+				lower: this.chLows[i],
+				upper: this.chHighs[i]
+			})
+		}
 	}
 	
 	setChNames(chNames){
@@ -57,36 +58,34 @@ class SettingInfo{
 		return this.chDisplay;
 	}
 	
-	setCh1High(ch1High){
-		this.ch1High = ch1High;
+	setChHighs(chHighs){
+		this.chHighs = chHighs;
+		this.chRanges = new Array();
+		for(let i = 0 ; i < this.chHighs.length; i++){
+			this.chRanges.push({
+				lower: this.chLows[i],
+				upper: this.chHighs[i]
+			})
+		}
 	}
 	
-	getCh1High(){
-		return this.ch1High;
+	getChHighs(){
+		return this.chHighs;
 	}
 	
-	setCh1Low(ch1Low){
-		this.ch1Low = ch1Low;
+	setChLows(chLows){
+		this.chLows = chLows;
+		this.chRanges = new Array();
+		for(let i = 0 ; i < this.chHighs.length; i++){
+			this.chRanges.push({
+				lower: this.chLows[i],
+				upper: this.chHighs[i]
+			})
+		}
 	}
 	
-	getCh1Low(){
-		return this.ch1Low;
-	}
-	
-	setCh2High(ch2High){
-		this.ch2High = ch2High;
-	}
-	
-	getCh2High(){
-		return this.ch2High;
-	}
-	
-	setCh2Low(ch2Low){
-		this.ch2Low = ch2Low;
-	}	
-	
-	getCh2Low(){
-		return this.ch2Low;
+	getChLows(){
+		return this.chLows;
 	}
 }
 
@@ -119,13 +118,21 @@ export class SettingServiceProvider {
 				["온도(1)","습도(2)","온도(3)","습도(4)","온도(5)","습도(6)","온도(7)","습도(8)"], 
 				["℃","RH","℃","RH","℃","RH","℃","RH"], 
 				[true,true,true,true,true,true,true,true],
-				35,
-				15,
-				80,
-				40);
+				[35,80,35,80,35,80,35,80],
+				[15,40,15,40,15,40,15,40]
+				);
 			}
+			console.log("settings");
+			console.log(JSON.stringify(val));
 			this.setting = val;
-			console.log(this.setting);
+			this.setting.chRanges = new Array();
+			for(let i = 0 ; i < val.chNames.length; i++){
+				this.setting.chRanges.push({
+					lower: val.chLows[i],
+					upper: val.chHighs[i]
+				})
+			}
+			console.log(JSON.stringify(this.setting));
 		  });
 		  //console.log(this.setting);
 	  }
@@ -134,7 +141,7 @@ export class SettingServiceProvider {
 		  return this.setting;
 	  }
 	  
-	  save(chNames, chUnits, chDisplay, ch1High, ch1Low, ch2High, ch2Low){
+	  save(chNames, chUnits, chDisplay, chRanges){
 		  /*
 		  this.setting.setChNames(chNames);
 		  this.setting.setChUnits(chUnits);
@@ -147,10 +154,10 @@ export class SettingServiceProvider {
 		  this.setting.chNames = chNames;
 		  this.setting.chUnits = chUnits;
 		  this.setting.chDisplay = chDisplay;
-		  this.setting.ch1High = ch1High;
-		  this.setting.ch1Low = ch1Low;
-		  this.setting.ch2High = ch2High;
-		  this.setting.ch2Low = ch2Low;
+		  for(let i = 0 ; i < chNames.length; i++){
+			  this.setting.chHighs[i] = chRanges[i].upper;
+			  this.setting.chLows[i] = chRanges[i].lower;
+			}
 		  console.log("setting save");
 		  console.log(this.username);
 		  console.log(this.setting);
@@ -158,7 +165,7 @@ export class SettingServiceProvider {
 		  this.storage.get(this.username).then((val) =>{
 			console.log("result");
 		  
-			console.log(val);		  
+			console.log(JSON.stringify(this.setting));		  
 		  });
 		  
 	  }

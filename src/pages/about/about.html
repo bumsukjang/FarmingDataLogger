@@ -20,7 +20,9 @@
 			<ion-label>
 				사이트 번호
 			</ion-label>
-			<div item-content>
+			<ion-input *ngIf="username == 'admin'" [(ngModel)]="siteId"></ion-input>
+			<button item-end *ngIf="username == 'admin'"  ion-button (click)="changeAccount()">계정변경</button>
+			<div item-content *ngIf="username != 'admin'">
 				{{this.siteId}}
 			</div>
 		</ion-item>
@@ -54,11 +56,11 @@
 		<ion-item-divider>
 			채널설정
 		</ion-item-divider>
-		<ion-row *ngFor="let i of [0,1,2,3,4,5,6,7]">
+		<ion-row *ngFor="let i of [0,1,2,3,4,5,6,7]" >
 			<ion-col width-20>
 				<ion-item>
 					<ion-label>ch{{i+1}}</ion-label>
-					<ion-checkbox [(ngModel)]="chDisplay[i]"></ion-checkbox>
+					<ion-checkbox [(ngModel)]="chDisplay[i]" class="displayBox"></ion-checkbox>
 				</ion-item>
 			</ion-col>
 			<ion-col width-40>
@@ -71,44 +73,29 @@
 					<ion-input item-content [(ngModel)]="chUnits[i]" placeholder="단위"></ion-input>
 				</ion-item>
 			</ion-col>
+			<ion-item color="light"  [ngClass]="{true:'transition',false:'hide'}[chDisplay[i]]"  >	
+				<ion-label stacked>알람기준<ion-row>
+					<ion-col width-50>
+						<ion-item>
+							<ion-label stacked>최저값</ion-label>
+							<ion-input [(ngModel)]="chRanges[i].lower" placeholder="5"></ion-input>
+						</ion-item>
+					</ion-col>
+					<ion-col width-50>
+						<ion-item>
+							<ion-label stacked>최고값</ion-label>
+							<ion-input [(ngModel)]="chRanges[i].upper" placeholder="5"></ion-input>
+						</ion-item>
+					</ion-col>
+					<!-- <ion-badge item-end color="danger">최저 : {{chRanges[i].lower}}</ion-badge>
+					<ion-badge item-end color="danger">최고 : {{chRanges[i].upper}}</ion-badge> -->
+				</ion-row></ion-label>			
+				<ion-range [(ngModel)]="chRanges[i]" min="-50" max="100" dualKnobs="true" step="0.2" snaps="true" pin="true">
+					<ion-label range-left small>-50</ion-label>
+					<ion-label range-right>100</ion-label>
+				</ion-range>
+			</ion-item>
 		</ion-row>
-		<ion-item-divider>
-			알람기준
-		</ion-item-divider>
-		<ion-item>
-			<ion-icon name="thermometer" item-start ></ion-icon>
-			<ion-label>최고온도(℃)</ion-label>
-			<ion-input item-content [(ngModel)]="ch1High" name="ch1High"></ion-input>
-		</ion-item>
-		<ion-item>
-			<ion-icon name="thermometer" item-start ></ion-icon>
-			<ion-label>최저온도(℃)</ion-label>
-			<ion-input item-content [(ngModel)]="ch1Low" name="ch1Low"></ion-input>
-		</ion-item>
-		<!--
-		<ion-item>
-			<ion-icon name="ios-pulse" item-start ></ion-icon>
-			<ion-label>최고습도(RH)</ion-label>
-			<ion-range item-content dualKnobs="true" pin="true" [(ngModel)]="tempHighLow" min="-50" max="100" step="0.1" snaps="true"></ion-range>
-		</ion-item>
-		-->
-		<ion-item>
-			<ion-icon name="ios-pulse" item-start ></ion-icon>
-			<ion-label>최고습도(RH)</ion-label>
-			<ion-input item-content [(ngModel)]="ch2High" name="ch2High"></ion-input>
-		</ion-item>
-		<ion-item>
-			<ion-icon name="ios-pulse" item-start ></ion-icon>
-			<ion-label>최저습도(RH)</ion-label>
-			<ion-input item-content [(ngModel)]="ch2Low" name="ch2Low"></ion-input>
-		</ion-item>
-		<!--
-		<ion-item>
-			<ion-icon name="ios-pulse" item-start ></ion-icon>
-			<ion-label>최고습도(RH)</ion-label>
-			<ion-range item-content dualKnobs="true" pin="true" [(ngModel)]="hHighLow" min="-50" max="100" step="0.1" snaps="true"></ion-range>
-		</ion-item>
-		-->
 	</ion-list>
 	<button ion-button full (click)="saveSetting()">저장</button>
 </ion-content>

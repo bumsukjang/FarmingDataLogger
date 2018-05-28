@@ -20,6 +20,7 @@ import { Observable } from 'rxjs/Rx';
 import { LoginPage } from '../login/login';
 import { DomElementSchemaRegistry } from '@angular/compiler';
 
+
 @Component({
   selector: 'page-sensor',
   templateUrl: 'sensor.html'
@@ -41,6 +42,7 @@ export class SensorPage {
 	setting;
 	graphMinTime;
 	graphMaxTime;
+
 	constructor(public backgroundMode : BackgroundMode, 
 	public navCtrl: NavController, 
 	public alertCtrl: AlertController, 
@@ -81,18 +83,53 @@ export class SensorPage {
 	}
 
 	updateData(){
-		let currentTime = new Date()
+		/* let currentTime = new Date()
 		let month = currentTime.getMonth() + 1
 		let day = currentTime.getDate()
 		let year = currentTime.getFullYear()
 		this.graphMinTime = new Date(day + "/" + month  + "/" + year + "00:00:00");
-		this.graphMaxTime = new Date(day + "/" + month  + "/" + year + "23:59:59");
+		this.graphMaxTime = new Date(day + "/" + month  + "/" + year + "23:59:59"); */
 		console.log("updateData");
-		let urls = ["temp_trend_json","humi_trend_json"];
+		this.http.get('https://mpljqoh0sc.execute-api.us-east-1.amazonaws.com/daoniFarmingDataLogger/temp_trend_json?site_id='+this.auth.getUserInfo().getSiteId()+'&req_type=1', {}, {})
+		.then(data => {
+			this.json_data = JSON.parse(data.data);
+
+			let chartConfig = this.chartConfig;
+			chartConfig.data.labels = new Array();
+			chartConfig.data.datasets[0].label = this.setting.chNames[0];
+			chartConfig.data.datasets[1].label = this.setting.chNames[1];
+		
+			chartConfig.data.datasets[0].data = new Array();
+			chartConfig.data.datasets[1].data = new Array();
+			for(var i = 0; i < this.json_data['time'].length ; i++){
+				let label = this.json_data['time'][i];
+				
+				if(label != null){
+					let timeLabel = new Date(label.toString().split("Z")[0]);
+					chartConfig.data.labels.push(timeLabel);
+					
+					chartConfig.data.datasets[0].data.push(this.json_data['ch'][0][i]);
+					chartConfig.data.datasets[1].data.push(this.json_data['ch'][1][i]);
+
+					// console.log(label);
+					// console.log(timeLabel);
+					// console.log(this.json_data['ch'][0][i]);
+					// console.log(this.json_data['ch'][1][i]);
+				}
+			}
+			if(this.lineChart == null){
+				this.lineChart = new Chart(this.lineCanvas.nativeElement, chartConfig);
+			}
+			this.lineChart.update();					
+		}).catch(error => {
+			this.showAlert('접속 오류 : 그래프정보 site_id='+this.auth.getUserInfo().getSiteId()+' req_type=1');
+		});
+		
+/* 
 		for(var urlIndex = 0; urlIndex < urls.length; urlIndex++){
 			console.log("URL is");
-			console.log('http://59.0.228.137:8080/'+urls[urlIndex]+'?site_id='+this.auth.getUserInfo().getSiteId()+'&req_type=1');
-			this.http.get('http://59.0.228.137:8080/'+urls[urlIndex]+'?site_id='+this.auth.getUserInfo().getSiteId()+'&req_type=1', {}, {})
+			console.log('https://mpljqoh0sc.execute-api.us-east-1.amazonaws.com/daoniFarmingDataLogger/'+urls[urlIndex]+'?site_id='+this.auth.getUserInfo().getSiteId()+'&req_type=1');
+			this.http.get('https://mpljqoh0sc.execute-api.us-east-1.amazonaws.com/daoniFarmingDataLogger/'+urls[urlIndex]+'?site_id='+this.auth.getUserInfo().getSiteId()+'&req_type=1', {}, {})
 			.then(data => {
 				let dataIndex = -1;		
 				console.log(data);		
@@ -109,7 +146,7 @@ export class SensorPage {
 				chartConfig.data.labels = [];
 				chartConfig.data.datasets[dataIndex].data = [];
 				/* let minTime;
-				let maxTime; */
+				let maxTime; //
 				for(var i = 0; i < this.json_data['columns'][0].length ; i++){
 					let label = this.json_data['columns'][0][i];
 					let dataset = this.json_data['columns'][1][i];
@@ -122,7 +159,7 @@ export class SensorPage {
 							maxTime = timeLabel;
 						} else if(i == this.json_data['columns'][0].length - 1){
 							minTime = timeLabel;
-						} */
+						} //
 						chartConfig.data.labels.push(timeLabel);
 						chartConfig.data.datasets[dataIndex].data.push(dataset);
 					}
@@ -142,7 +179,7 @@ export class SensorPage {
 					ticks:{
 						source: 'auto'
 					}						
-				}; */
+				}; //
 				if(this.lineChart == null){
 					this.lineChart = new Chart(this.lineCanvas.nativeElement, chartConfig);
 				}
@@ -150,7 +187,7 @@ export class SensorPage {
 				this.lineChart.update();					
 			}).catch(error => {
 				console.log('error');
-				this.showAlert('접속 오류 : http://59.0.228.137:8080/'+urls[0]+'?site_id='+this.auth.getUserInfo().getSiteId()+'&req_type=1');
+				this.showAlert('접속 오류 : '+urls[0]+'?site_id='+this.auth.getUserInfo().getSiteId()+'&req_type=1');
 				console.log(error);
 				console.log(error.status);			
 			});
@@ -191,24 +228,29 @@ export class SensorPage {
 			this.showAlert("http://59.0.228.137:8080/humi_trend_json 접속 오류");
 			console.log(error);
 			console.log(error.status);			
-		});		 */
+		});		//
+		 */
 		
-		
-		this.http.get('http://59.0.228.137:8080/data_json?site_id='+this.auth.getUserInfo().getSiteId()+'&req_type=1', {}, {})
+		this.http.get('https://mpljqoh0sc.execute-api.us-east-1.amazonaws.com/daoniFarmingDataLogger/data_json?site_id='+this.auth.getUserInfo().getSiteId()+'&req_type=1', {}, {})
 		.then(data => {
 			this.json_data = JSON.parse(data.data);
-			this.date = this.json_data['msg_device'].split(' : ')[1];
+			this.date = this.json_data['msg_device'].split(' : ')[1].toString().split("GMT")[0];
+			console.log(this.json_data['msg_device']);
+
+			console.log(this.date);
 			for(var i = 0; i < 8; i++){
 				this.ch[i] = this.json_data['ch'+(i+1).toString()][2];	
 			}
+			console.log(this.ch);
+			this.setting = this.settingService.get();
+			console.log(JSON.stringify(this.setting));
 			if(this.setting != null){
-				if(this.ch[0] > this.setting.ch1High || this.ch[0] < this.setting.ch1Low){
-					this.showAlert("온도 이상(현재:"+this.ch[0]+")");
-					console.log('[sensor.ts] updateData() : ch1(' + this.ch[0] +'),ch1High(' +this.setting.ch1High+'),ch1Low('+this.setting.ch1Low+')');
-				}
-				if(this.ch[1] > this.setting.ch2High || this.ch[1] < this.setting.ch1Low){
-					this.showAlert("습도 이상(현재:"+this.ch[1]+")");
-					console.log('[sensor.ts] updateData() : ch2(' + this.ch[1] +'),ch1High(' +this.setting.ch2High+'),ch1Low('+this.setting.ch2Low+')');
+				for(var chIndex = 0; chIndex < this.ch.length; chIndex++){
+					console.log('[sensor.ts] updateData() : ch(' + this.ch[chIndex] +'),chHigh(' +this.setting.chHighs[chIndex]+'),ch1Low('+this.setting.chLows[chIndex]+')');
+					if(this.setting.chDisplay[chIndex] && (this.ch[chIndex] >= this.setting.chHighs[chIndex] || this.ch[chIndex] <= this.setting.chLows[chIndex])){
+						this.showAlert(this.setting.chNames[chIndex] + " 이상(현재:"+this.ch[chIndex]+" "+this.setting.chUnits[chIndex]+")");
+						console.log('[sensor.ts] updateData() : ch(' + this.ch[chIndex] +'),chHigh(' +this.setting.chHighs[chIndex]+'),ch1Low('+this.setting.chLows[chIndex]+')');
+					}
 				}
 			}
 			this.siteID = this.json_data['num_site'];
@@ -218,14 +260,14 @@ export class SensorPage {
 				this.alive = "연결안됨";
 			}
 			console.log('[sensor.ts] - updateData() http-get_data-then');
-			this.setting = this.settingService.get();
+			
 			console.log('[sensor.ts] - updateData() http-get_data-then this.setting : ' + this.setting);
 			console.log(this.setting);
 		
 		}).catch(error => {
 			console.log('error');
 			console.log('[sensor.ts - updateData()] http://59.0.228.137:8080/data_json?site_id=');
-			this.showAlert("http://59.0.228.137:8080/data_json 접속 오류");
+			this.showAlert("data_json 접속 오류");
 			console.log(error);
 			console.log(error.status);			
 		});
@@ -247,24 +289,22 @@ export class SensorPage {
 	
 	scheduleNotification(text){
 		this.localNotifications.schedule({
-			id: 1,
 			title: 'Farming Data Logger 알람',
-			text: text,		  
-			data: {mydata: 'My hidden message this is' }
+			text: text
 		});
 	} 
 	
 	showAlert(text) {	
 		if(this.backgroundMode.isActive()){
 			this.scheduleNotification(text);
-		} else {						
-			let alert = this.alertCtrl.create({
-			  title: '알람',
-			  subTitle: text,
-			  buttons: ['OK']
-			});
-			alert.present();
-		}		
+		}
+								
+		let alert = this.alertCtrl.create({
+			title: '알람',
+			subTitle: text,
+			buttons: ['OK']
+		});
+		alert.present();
 	  }	  
 	
 	chartConfig = { 
@@ -323,9 +363,9 @@ export class SensorPage {
 						displayFormats: {
 							quarter: 'MMM YYYY'
 						},
-						minUnit: 'minute',
-						min: this.graphMinTime,
-						max: this.graphMaxTime
+						minUnit: 'minute'
+						//min: this.graphMinTime,
+						//max: this.graphMaxTime
 					},
 					distribution: 'linear',					
 				}],

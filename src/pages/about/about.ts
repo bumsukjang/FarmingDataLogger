@@ -1,3 +1,4 @@
+import { TabsPage } from './../tabs/tabs';
 import { Component } from '@angular/core';
 import { NavController, AlertController } from 'ionic-angular';
 
@@ -22,101 +23,17 @@ export class AboutPage {
 	chNames: string[] = [];
 	chUnits: string[] = [];
 	chDisplay: boolean[] = [];
-	
-	ch1High: number;
-	ch1Low: number;
-	
-	ch2High: number;
-	ch2Low: number;
-	
+	chHighs: number[] = [];
+	chLows: number[] = [];
+	chRanges: any[] = [];
+		
   constructor(private storage: Storage, 
 			  public navCtrl: NavController, 
 			  private auth: AuthServiceProvider, 
 			  private alertCtrl: AlertController, 
 			  private setting: SettingServiceProvider) {
-	/*setting.init(auth.getUserInfo().getUsername());
 	
-	this.username = auth.getUserInfo().getUsername();
-	this.siteId = auth.getUserInfo().getSiteId();
-	this.device = auth.getUserInfo().getDevice();
-	this.location = auth.getUserInfo().getLocation();
-	this.phone = auth.getUserInfo().getPhone();
-	setting.init(auth.getUserInfo().getUsername());
-	
-	console.log("settingInfo");
-	console.log(this.setting.get());
-	
-	this.chNames = setting.get().chNames;
-	this.chUnits = setting.get().chUnits;
-	this.chDisplay = setting.get().chDisplay;
-	this.ch1High = setting.get().ch1High;
-	this.ch1Low = setting.get().ch1Low;
-	this.ch2High = setting.get().ch2High;
-	this.ch2Low = setting.get().ch2Low;
-	*/
-	
-	/*
-	this.chNames = setting.get().getChNames();
-	this.chUnits = setting.get().getChUnits();
-	this.chDisplay = setting.get().getChDisplay();
-	this.ch1High = setting.get().getCh1High();
-	this.ch1Low = setting.get().getCh1Low();
-	this.ch2High = setting.get().getCh2High();
-	this.ch2Low = setting.get().getCh2Low();
-	*/
-	/*
-	storage.get(auth.getUserInfo()).then((val) => {
-		setting.set(val);
-	});
-	*/
-	
-	/*
-	this.ch1High = auth.getUserInfo().getCh1High();
-	this.ch1Low = auth.getUserInfo().getCh1Low();
-	this.ch2High = auth.getUserInfo().getCh2High();
-	this.ch2Low = auth.getUserInfo().getCh2Low();
-	this.tempHighLow = {
-		upper: this.ch1High,
-		lower: this.ch1Low
-	}
-	this.humiHighLow = {
-		upper: this.ch2High,
-		lower: this.ch2Low
-	}
-	
-	
-	storage.get('ch1High').then((val) => {
-		this.settingInfo.ch1High = val;
-	});
-	storage.get('ch1Low').then((val) => {
-		this.settingInfo.ch1Low = val;
-	});
-	storage.get('ch2High').then((val) => {
-		this.settingInfo.ch2High = val;
-	});
-	storage.get('ch2Low').then((val) => {
-		this.settingInfo.ch2Low = val;
-	});
-	*/
-  }
-  ionViewWillEnter(){
-	  	console.log("[about.ts - ionViewDidLoad()]");
-		console.log("[about.ts - ionViewDidLoad()] username : " + this.auth.getUserInfo().getUsername());
-		this.setting.init(this.auth.getUserInfo().getUsername());
-		
-		console.log("[about.ts - ionViewDidLoad()] this.setting.get() : " + this.setting.get());		
-	  if(this.setting.get() != null){
-		  this.chNames = this.setting.get().chNames;
-		this.chUnits = this.setting.get().chUnits;
-		this.chDisplay = this.setting.get().chDisplay;
-		this.ch1High = this.setting.get().ch1High;
-		this.ch1Low = this.setting.get().ch1Low;
-		this.ch2High = this.setting.get().ch2High;
-		this.ch2Low = this.setting.get().ch2Low
-	  }
-  }
-  
-  ionViewDidLoad(){
+
 	this.username = this.auth.getUserInfo().getUsername();
 	this.siteId = this.auth.getUserInfo().getSiteId();
 	this.device = this.auth.getUserInfo().getDevice();
@@ -126,18 +43,76 @@ export class AboutPage {
 	console.log("[about.ts - ionViewDidLoad()]");
 	console.log(this.setting.get());
 	
-	
+	let settings = this.setting.get()
 	this.storage.get(this.username).then((val) => {
+		console.log(val);
 		if(val != null){
-			this.chNames = val.chNames;
-			this.chUnits = val.chUnits;
-			this.chDisplay = val.chDisplay;
-			this.ch1High = val.ch1High;
-			this.ch1Low = val.ch1Low;
-			this.ch2High = val.ch2High;
-			this.ch2Low = val.ch2Low;	
+			settings = val;
 		}
 	});
+
+	if(settings != null){
+		this.chNames = settings.chNames;
+		this.chUnits = settings.chUnits;
+		this.chDisplay = settings.chDisplay;
+		this.chHighs = settings.chHighs;
+		this.chLows = settings.chLows;
+		this.chRanges = settings.chRanges;
+		console.log("this.chRanges");
+		console.log(this.chRanges);
+	}
+
+  }
+  /* ionViewWillEnter(){
+	  	console.log("[about.ts - ionViewDidLoad()]");
+		console.log("[about.ts - ionViewDidLoad()] username : " + this.auth.getUserInfo().getUsername());
+		this.setting.init(this.auth.getUserInfo().getUsername());
+		
+		console.log("[about.ts - ionViewDidLoad()] this.setting.get() : " + this.setting.get());		
+	  if(this.setting.get() != null){
+		  this.chNames = this.setting.get().chNames;
+		this.chUnits = this.setting.get().chUnits;
+		this.chDisplay = this.setting.get().chDisplay;
+		this.chHighs = this.setting.get().chHighs;
+		this.chLows = this.setting.get().chLows;
+		for(let i = 0 ; i < this.chHighs.length; i++){
+			this.chRanges[0] = {
+				lower: this.chLows[i],
+				upper: this.chHighs[i]
+			};
+		}
+		console.log("this.chRanges");
+		console.log(this.chRanges);
+	  }
+  } */
+  ionViewWillEnter(){
+	this.username = this.auth.getUserInfo().getUsername();
+	this.siteId = this.auth.getUserInfo().getSiteId();
+	this.device = this.auth.getUserInfo().getDevice();
+	this.location = this.auth.getUserInfo().getLocation();
+	this.phone = this.auth.getUserInfo().getPhone();
+	
+	console.log("[about.ts - ionViewDidLoad()]");
+	console.log(this.setting.get());
+	
+	let settings = this.setting.get()
+	this.storage.get(this.username).then((val) => {
+		console.log(val);
+		if(val != null){
+			settings = val;
+		}
+	});
+
+	if(settings != null){
+		this.chNames = settings.chNames;
+		this.chUnits = settings.chUnits;
+		this.chDisplay = settings.chDisplay;
+		this.chHighs = settings.chHighs;
+		this.chLows = settings.chLows;
+		this.chRanges = settings.chRanges;
+		console.log("this.chRanges");
+		console.log(this.chRanges);
+	}
 	
 	/*
 	this.ch1High = this.auth.getUserInfo().getCh1High();
@@ -172,11 +147,11 @@ export class AboutPage {
 		this.setting.save(this.chNames, 
 		this.chUnits,
 		this.chDisplay,
-		this.ch1High,
-		this.ch1Low,
-		this.ch2High,
-		this.ch2Low);
-	
+		this.chRanges);
+
+		if(this.username =='admin'){
+			this.auth.currentUser.siteID = this.siteId;
+		}
 	  this.showAlert("저장성공");
 	  /*
 	  this.auth.getUserInfo().setCh1High(this.ch1High);
@@ -201,4 +176,17 @@ export class AboutPage {
     alert.present();
   }
 
+  changeAccount(){
+	this.auth.login({username:this.username}, { 'data' : '{"logFlag": true,"modified": true,"reqType": 1,"siteId": '+this.siteId+'}'}).subscribe(allowed => {
+		if (allowed) {
+			//AboutPage.reload();
+			this.navCtrl.parent.viewCtrl._nav.setRoot(TabsPage);
+		} else {
+			console.log("change account error");
+		}
+	},
+	error => {
+		console.log("change account error");
+	});	
+  }
 }
